@@ -374,6 +374,11 @@ filled states render identically.
 - `composeApp/src/androidMain/kotlin/`: Android-specific code
 - `composeApp/src/desktopMain/kotlin/`: Desktop-specific code
 
+### iOS
+- `iosApp/SimpMusic.xcodeproj`: SwiftUI host project for the Compose Multiplatform app
+- `.github/workflows/ios-simulator.yml`: Manual macOS simulator build and tests; uploads the simulator app
+- `.github/workflows/ios-ipa.yml`: Manual unsigned arm64 device IPA build; uploads `simpmusic-ios-unsigned-ipa` for local signing before sideloading
+
 ### Database
 - `core/data/src/main/java/.../database/`: Room database schemas
 - Migrations in Database class
@@ -561,6 +566,7 @@ if (getPlatform() == Platform.Android) {
 - **SimpMusic Lyrics voting**: Vote functionality for community lyrics
 
 ### New Features (post-1.0.4, dev branch)
+- **iOS unsigned IPA workflow (2026-10-21)**: GitHub Actions manually builds an unsigned arm64 device IPA and uploads `simpmusic-ios-unsigned-ipa`; sign locally before sideloading.
 - **Icons unified on Material Symbols (2026-08-03)**: `material-icons-core`/`material-icons-extended` are gone, and so are the XML icon drawables — every icon is now a generated `ImageVector` under `ui/icon/`, addressed as `SimpIcons.<Name>`. Two migrations fed into this: 59 icons replacing `Icons.*` (117 call sites), then 25 more replacing `painterResource(Res.drawable.baseline_*)` (167 call sites, 44 XML files deleted). `RippleIconButton`, `LiquidGlassIconButton` and `ActionButton` changed from taking `DrawableResource`/`Painter` to `ImageVector`. See **Common Tasks → Add a New Icon** for how to add one and which traps to avoid. Icons whose colour carries meaning (`baseline_downloaded`, `baseline_favorite_24`), the logos (`mono`, `monochrome`) and the `holder*` bitmaps deliberately stay as resources.
 - **Deep link support**: `simpmusic://` and `simpmusic.org` URL schemes
 - **Desktop Crash dialog**: Error reporting UI for desktop
@@ -1096,6 +1102,6 @@ After completing any of the following types of changes, the AI agent **MUST** up
 
 *This document helps AI Agents quickly understand the SimpMusic project. Update regularly when there are major changes to architecture or structure.*
 
-**Last updated**: 2026-10-18
+**Last updated**: 2026-10-21
 **Project version**: Check latest release on GitHub
 **Maintained by**: maxrave-dev and contributors
