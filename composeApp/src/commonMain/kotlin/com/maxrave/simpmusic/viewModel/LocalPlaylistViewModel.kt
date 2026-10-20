@@ -40,6 +40,7 @@ import com.maxrave.logger.LogLevel
 import com.maxrave.logger.Logger
 import com.maxrave.simpmusic.pagination.PagingActions
 import com.maxrave.simpmusic.viewModel.base.BaseViewModel
+import com.maxrave.common.dispatcher.ioDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -143,7 +144,7 @@ class LocalPlaylistViewModel(
                             if (downloadState == STATE_DOWNLOADED || downloadState == STATE_DOWNLOADING) {
                                 newUpdateJob?.cancel()
                                 newUpdateJob =
-                                    launch(Dispatchers.IO) {
+                                    launch(ioDispatcher) {
                                         localPlaylistRepository
                                             .listTrackFlow(uiState.value.id)
                                             .distinctUntilChanged()

@@ -13,6 +13,7 @@ import coil3.request.ImageResult
 import coil3.request.SuccessResult
 import com.maxrave.logger.Logger
 import kotlinx.coroutines.CancellationException
+import com.maxrave.common.dispatcher.ioDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.ensureActive
@@ -153,7 +154,7 @@ class NetworkFirstInterceptor(
             throw cancelled
         } finally {
             // Cancellation must propagate, but it must not leave completed staging entries behind.
-            withContext(NonCancellable + Dispatchers.IO) {
+            withContext(NonCancellable + ioDispatcher) {
                 try {
                     diskCache?.remove(temporaryKey)
                 } catch (error: Exception) {
@@ -170,7 +171,7 @@ class NetworkFirstInterceptor(
     }
 
     @OptIn(InternalCoilApi::class)
-    private suspend fun readCachedAt(diskCache: DiskCache?, key: String): Long? = withContext(Dispatchers.IO) {
+    private suspend fun readCachedAt(diskCache: DiskCache?, key: String): Long? = withContext(ioDispatcher) {
         if (diskCache == null) return@withContext null
         try {
             diskCache.openSnapshot(key)?.use { snapshot ->
@@ -187,7 +188,7 @@ class NetworkFirstInterceptor(
         diskCache: DiskCache,
         temporaryKey: String,
         diskKey: String,
-    ): Boolean = withContext(Dispatchers.IO) {
+    ): Boolean = withContext(ioDispatcher) {
         try {
             val snapshot = diskCache.openSnapshot(temporaryKey) ?: return@withContext false
             snapshot.use {

@@ -81,6 +81,7 @@ import com.maxrave.simpmusic.ui.icon.UnfoldLess
 import com.maxrave.simpmusic.ui.icon.UnfoldMore
 import com.maxrave.simpmusic.ui.theme.LocalIsDarkTheme
 import com.maxrave.simpmusic.ui.theme.typo
+import com.maxrave.common.dispatcher.ioDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -167,7 +168,7 @@ fun AppLogScreen(
             if (!isPaused) {
                 val (app, errors) =
                     tailLock.withLock {
-                        withContext(Dispatchers.IO) {
+                        withContext(ioDispatcher) {
                             (if (appTail.poll()) appTail.lines else null) to
                                 (if (errorTail.poll()) errorTail.lines else null)
                         }

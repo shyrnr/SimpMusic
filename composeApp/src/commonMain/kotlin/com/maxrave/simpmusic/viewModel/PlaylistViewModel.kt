@@ -31,6 +31,7 @@ import com.maxrave.simpmusic.viewModel.PlaylistUIState.Error
 import com.maxrave.simpmusic.viewModel.PlaylistUIState.Loading
 import com.maxrave.simpmusic.viewModel.PlaylistUIState.Success
 import com.maxrave.simpmusic.viewModel.base.BaseViewModel
+import com.maxrave.common.dispatcher.ioDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -97,7 +98,7 @@ class PlaylistViewModel(
     init {
         viewModelScope.launch {
             val listTrackStringJob =
-                launch(Dispatchers.IO) {
+                launch(ioDispatcher) {
                     downloadState
                         .collectLatest { state ->
                             newUpdateJob?.cancel()

@@ -6,6 +6,7 @@ import com.maxrave.logger.Logger
 import com.maxrave.simpmusic.expect.shareImage
 import com.maxrave.simpmusic.getPlatform
 import com.maxrave.simpmusic.utils.VersionManager
+import com.maxrave.common.dispatcher.ioDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.number
@@ -212,7 +213,7 @@ private fun redactSecrets(text: String): String = SECRETS.fold(text) { acc, (pat
 /** Every log file, oldest first, as one redacted text file handed to [shareImage]. */
 internal suspend fun exportLog(chooserTitle: String): Boolean {
     val bytes =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             runCatching {
                 buildString {
                     appendLine("SimpMusic ${VersionManager.getVersionName()} · ${getPlatform().osName()}")
