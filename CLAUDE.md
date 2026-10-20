@@ -56,11 +56,12 @@
 
 #### 1. **composeApp/**
 - **Shared Compose Multiplatform module** - main module containing shared code
-- Supports: Android, Desktop (JVM), iOS (future)
+- Supports: Android, Desktop (JVM), iOS (KMP bootstrap; incomplete)
 - Contains all UI (Compose) and business logic
 - Source sets:
   - `commonMain/`: Shared code for all platforms
   - `androidMain/`: Android-specific code
+  - `iosMain/`: iOS-specific implementations and Compose/UIKit host integration
   - `desktopMain/`: Desktop-specific code
 - Can run **Desktop app directly** from this module
 
@@ -74,7 +75,13 @@
   - Entry point for Android app
 - **vivoAndroidApp/** builds the same app under `com.spotify.music` for vivo's Origin Island. It has no code of its own: its source set points at androidApp's sources, resources and manifest. Its `build.gradle.kts` mirrors androidApp's, so keep the two in step.
 
-#### 3. **core/**
+#### 3. **iosApp/**
+- SwiftUI host project: `iosApp/SimpMusic.xcodeproj`
+- Embeds the static `ComposeApp` framework built by `:composeApp`
+- Bundle ID is `com.maxrave.simpmusic.ios`; signing and Team ID remain user-managed in Xcode
+- The iOS host, static `ComposeApp` framework, minimal AVPlayer streaming handler, and iOS Brotli codec are present. Playback and codec code still require macOS/Xcode compilation and simulator testing; WebView sign-in, playback persistence, radio/related-track behavior, casting, and several platform services are incomplete.
+
+#### 4. **core/**
 Contains core modules organized by functionality:
 
 ##### **core/common/**
@@ -542,6 +549,7 @@ if (getPlatform() == Platform.Android) {
 ### Architecture Changes
 - **Desktop: GStreamer → VLCJ**: Completely replaced GStreamer with VLCJ for desktop audio playback
 - **DEB/RPM builds removed**: Desktop Linux now only ships AppImage
+- **iOS shared UI bootstrap (2026-10-20)**: Enabled `iosArm64` and `iosSimulatorArm64` in `composeApp`, added a SwiftUI/Xcode host and iOS `expect`/`actual` coverage. This is not a functional music-player port yet: the iOS media handler remains unimplemented and several iOS platform actuals deliberately report unsupported features.
 
 ### New Features (v1.0.4)
 - **Android Crossfade & DJ-style transition**: `CrossfadeExoPlayerAdapter` with auto mode (like AutoMix)
@@ -1096,6 +1104,6 @@ After completing any of the following types of changes, the AI agent **MUST** up
 
 *This document helps AI Agents quickly understand the SimpMusic project. Update regularly when there are major changes to architecture or structure.*
 
-**Last updated**: 2026-10-18
+**Last updated**: 2026-10-20
 **Project version**: Check latest release on GitHub
 **Maintained by**: maxrave-dev and contributors
