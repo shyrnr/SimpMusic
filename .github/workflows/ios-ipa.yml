@@ -34,8 +34,9 @@ jobs:
           xcodebuild -version
           xcrun --sdk iphoneos --show-sdk-version
 
+      # Kotlin/Native compile currently fails while Gradle serializes its configuration cache.
       - name: Compile iPhone device framework
-        run: ./gradlew :composeApp:linkDebugFrameworkIosArm64
+        run: ./gradlew --no-configuration-cache :composeApp:linkDebugFrameworkIosArm64
 
       - name: Build unsigned iPhone app
         run: |
