@@ -1,0 +1,78 @@
+name: iOS device IPA
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# GitHub context values are used only for the concurrency key, never in shell commands.
+concurrency:
+  group: ios-ipa-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build unsigned iPhone IPA
+    runs-on: macos-latest
+    timeout-minutes: 90
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: gradle
+
+      - name: Verify Apple toolchain
+        run: |
+          xcodebuild -version
+          xcrun --sdk iphoneos --show-sdk-version
+
+      - name: Compile iPhone device framework
+        run: ./gradlew :composeApp:linkDebugFrameworkIosArm64
+
+      - name: Build unsigned iPhone app
+        run: |
+          xcodebuild \
+            -project iosApp/SimpMusic.xcodeproj \
+            -target SimpMusic \
+            -configuration Debug \
+            -sdk iphoneos \
+            -arch arm64 \
+            -derivedDataPath "$RUNNER_TEMP/SimpMusicDeviceData" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
+
+      - name: Package unsigned IPA
+        run: |
+          APP_PATH="$RUNNER_TEMP/SimpMusicDeviceData/Build/Products/Debug-iphoneos/SimpMusic.app"
+          IPA_ROOT="$RUNNER_TEMP/SimpMusicIPA"
+          IPA_PATH="$RUNNER_TEMP/SimpMusic-unsigned.ipa"
+
+          test -d "$APP_PATH"
+          mkdir -p "$IPA_ROOT/Payload"
+          ditto "$APP_PATH" "$IPA_ROOT/Payload/SimpMusic.app"
+          (cd "$IPA_ROOT" && /usr/bin/ditto -c -k --sequesterRsrc --keepParent Payload "$IPA_PATH")
+          /usr/bin/unzip -t "$IPA_PATH"
+
+          {
+            echo "### Unsigned iPhone IPA created"
+            echo "Artifact: simpmusic-ios-unsigned-ipa"
+            echo "Import it into AltStore/SideStore (or another local signing tool) before installing."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload unsigned IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: simpmusic-ios-unsigned-ipa
+          path: ${{ runner.temp }}/SimpMusic-unsigned.ipa
+          if-no-files-found: error
+          retention-days: 7
