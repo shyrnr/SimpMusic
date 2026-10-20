@@ -83,6 +83,8 @@ kotlin {
             implementation(libs.koin.androidx.compose)
 
             implementation(libs.jetbrains.ui.tooling.preview)
+            // Android apps configure a shared Coil loader with OkHttpNetworkFetcherFactory.
+            api(libs.coil.network.okhttp)
             implementation(libs.constraintlayout.compose)
 
             api(libs.work.runtime.ktx)
@@ -109,6 +111,10 @@ kotlin {
             // Login WebViews: startUpWebView moves Chromium startup off the main thread
             implementation(libs.androidx.webkit)
         }
+        appleMain.dependencies {
+            implementation(libs.coil.network.ktor3)
+            implementation(libs.ktor.client.darwin)
+        }
         commonMain.dependencies {
             implementation(libs.runtime)
             implementation(libs.foundation)
@@ -122,8 +128,6 @@ kotlin {
             // Compose
             implementation(libs.compose.material3.adaptive)
             implementation(libs.compose.material.ripple)
-
-            implementation(libs.ui.tooling.preview)
 
             // Other module
             api(projects.common)
@@ -147,7 +151,7 @@ kotlin {
 
             // Coil
             api(libs.coil.compose)
-            api(libs.coil.network.okhttp)
+            api(libs.coil.network.core)
             api(libs.kmpalette.core)
             api(libs.kmpalette.network)
             implementation(libs.materialkolor)
@@ -193,6 +197,7 @@ kotlin {
             // JetBrains 2026 KMP default structure. This module keeps the
             // shared JVM UI + expect/actuals and their direct dependencies.
             implementation(compose.desktop.currentOs)
+            implementation(libs.coil.network.okhttp)
             implementation(libs.kotlinx.coroutinesSwing)
             implementation(libs.sentry.jvm)
             implementation(libs.native.tray)
