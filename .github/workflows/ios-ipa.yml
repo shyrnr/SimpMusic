@@ -38,12 +38,15 @@ jobs:
       - name: Compile iPhone device framework
         run: ./gradlew --no-configuration-cache :composeApp:linkDebugFrameworkIosArm64
 
-      - name: Upload CommonCrypto cinterop KLIBs on failure
+      - name: Upload CommonCrypto cinterop outputs on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: commoncrypto-cinterop-klibs
-          path: core/service/ktorExt/build/**/*.klib
+          name: commoncrypto-cinterop-outputs
+          path: |
+            core/service/ktorExt/build/classes/kotlin/iosArm64/main/cinterop/
+            core/service/ktorExt/build/classes/kotlin/iosSimulatorArm64/main/cinterop/
+            core/service/ktorExt/build/classes/kotlin/commonizer/
           if-no-files-found: warn
           retention-days: 3
 
